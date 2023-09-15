@@ -18,7 +18,7 @@ echo $IMAGES_IN_DIR
 echo ""
 
 #IMAGES=$(docker inspect --format='{{.Config.Image}}' $IMAGES_IN_DIR)
-IMAGES=$(docker inspect --size --format='{{.Id}}' $IMAGES_IN_DIR)
+IMAGES=$(docker inspect --size --format='{{.Id}}' "$IMAGES_IN_DIR")
 
 echo "IMAGES: $IMAGES"
 
