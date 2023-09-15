@@ -8,10 +8,22 @@ echo "OVERRIDE=$OVERRIDE"
 
 docker login ghcr.io -u "${GITHUB_REF}" -p "${REPO_TOKEN}"
 
-VERSION=$VERSION docker-compose -f docker-compose.yml -f "$OVERRIDE" up --no-start --remove-orphans
-IMAGES=$(docker inspect --format='{{.Image}}' "$(docker ps -aq)")
+VERSION=$VERSION docker compose -f docker-compose.yml -f "$OVERRIDE" build
+
+IMAGES_IN_DIR=$(docker ps -aq)
+
+echo "Images in dir:"
+echo ""
+echo $IMAGES_IN_DIR
+echo ""
+
+#IMAGES=$(docker inspect --format='{{.Config.Image}}' $IMAGES_IN_DIR)
+IMAGES=$(docker inspect --size --format='{{.Id}}' $IMAGES_IN_DIR)
 
 echo "IMAGES: $IMAGES"
+
+
+
 for IMAGE in $IMAGES; do
     echo "IMAGE: $IMAGE"
     
