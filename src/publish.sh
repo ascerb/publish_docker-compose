@@ -11,10 +11,16 @@ docker login ghcr.io -u "${GITHUB_REF}" -p "${REPO_TOKEN}"
 VERSION=$VERSION docker compose -f "$OVERRIDE" build
 
 DIM=$(docker images -aq)
-echo "DIM $DIM"
+echo "DIM1 $DIM"
 
+DIM=$(docker images -a)
+echo "DIM2 $DIM"
 
+DIM=$(docker ps -a)
+echo "DIM3 $DIM"
 
+DIM=$(docker ps -aq)
+echo "DIM4 $DIM"
 
 IMAGES=$(docker inspect --format='{{.Image}}' "$(docker ps -aq)")
 
