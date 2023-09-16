@@ -13,23 +13,35 @@ VERSION=$VERSION docker compose -f docker-compose.yml -f "$OVERRIDE" build
 IMAGES_IN_DIR=$(docker ps -aq)
 
 echo "Images in dir:"
-echo ""
-echo $IMAGES_IN_DIR
-echo ""
+echo "---"
+echo "$IMAGES_IN_DIR"
+echo "---"
+
 
 #IMAGES=$(docker inspect --format='{{.Config.Image}}' $IMAGES_IN_DIR)
-IMAGES=$(docker inspect --size --format='{{.Id}}' "$IMAGES_IN_DIR")
+#IMAGES=$(docker inspect  --size --format='{{.Id}}' "$IMAGES_IN_DIR")
 
-echo "IMAGES: $IMAGES"
+#echo "IMAGES: $IMAGES"
 
+#exit 1
 
+for IMAGE_RAW in $IMAGES_IN_DIR; do
+    echo "IMAGE RAW: $IMAGE_RAW"
 
-for IMAGE in $IMAGES; do
-    echo "IMAGE: $IMAGE"
+    IMAGE=$(docker inspect  --size --format='{{.Id}}' "$IMAGE_RAW")
+
+    if [ -z "$IMAGE" ]
+      then
+          echo "\$IMAGE is empty"
+      else
+          echo "\$var is NOT empty"
     
-    NAME=$(basename "${GITHUB_REPOSITORY}").$(docker inspect --format '{{ index .Config.Labels "name" }}' "$IMAGE")
-    TAG="ghcr.io/${GITHUB_REPOSITORY}/$NAME:$VERSION"
+          NAME=$(basename "${GITHUB_REPOSITORY}").$(docker inspect --format '{{ index .Config.Labels "name" }}' "$IMAGE")
+          TAG="ghcr.io/${GITHUB_REPOSITORY}/$NAME:$VERSION"
 
-    docker tag "$IMAGE" "$TAG"
-    docker push "$TAG"
+          docker tag "$IMAGE" "$TAG"
+          docker push "$TAG"
+      fi
+
+
 done
