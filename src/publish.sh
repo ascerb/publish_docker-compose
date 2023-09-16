@@ -10,26 +10,35 @@ docker login ghcr.io -u "${GITHUB_REF}" -p "${REPO_TOKEN}"
 
 VERSION=$VERSION docker compose -f "$OVERRIDE" build
 
-echo "GETTING ALL IMAGES LIST"
+echo "GETTING ALL IMAGES LIST:"
 echo "$(docker images -a)"
 
 delimiter="/"
 REPO_SUFFIX="${GITHUB_REPOSITORY#*$delimiter}"
 REPO_SUFFIX="^$REPO_SUFFIX-"
 
-echo "REPO suffix: $REPO_SUFFIX"
+echo "REPO suffix:"
+#echo "$REPO_SUFFIX"
+echo "$REPO_SUFFIX" | base64
 
 IMAGES=$(docker images -a | grep "$REPO_SUFFIX" | awk '{ print $3 }' )
 
-echo "OUR IMAGES LIST: $IMAGES"
+echo "---"
+echo "OUR IMAGES LIST:"
+echo "$IMAGES"
+echo "---"
+
 
 for IMAGE in $IMAGES; do
     echo ""
     echo ""
-    echo "IMAGE: $IMAGE"
+    echo "--- IMAGE: $IMAGE ---"
     
     NAME=$(basename "${GITHUB_REPOSITORY}").$(docker inspect --format '{{ index .Config.Labels "name" }}' "$IMAGE")
     TAG="ghcr.io/${GITHUB_REPOSITORY}/$NAME:$VERSION"
+
+    echo "NAME: $NAME"
+    echo "TAG: $TAG"
 
     docker tag "$IMAGE" "$TAG"
     docker push "$TAG"
