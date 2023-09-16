@@ -10,25 +10,22 @@ docker login ghcr.io -u "${GITHUB_REF}" -p "${REPO_TOKEN}"
 
 VERSION=$VERSION docker compose -f "$OVERRIDE" build
 
-echo "REPO: $GITHUB_REPOSITORY"
+echo "GETTING ALL IMAGES LIST"
+echo "$(docker images -a)"
 
-DIM=$(docker images -aq)
-echo "DIM1 $DIM"
+delimiter="/"
+REPO_SUFFIX="${GITHUB_REPOSITORY#*$delimiter}"
+REPO_SUFFIX="^$REPO_SUFFIX-"
 
-DIM=$(docker images -a)
-echo "DIM2 $DIM"
+echo "REPO suffix: $REPO_SUFFIX"
 
-DIM=$(docker ps -a)
-echo "DIM3 $DIM"
+IMAGES=$(docker images -a | grep "$REPO_SUFFIX" | awk '{ print $3 }' )
 
-DIM=$(docker ps -aq)
-echo "DIM4 $DIM"
-
-IMAGES=$(docker inspect --format='{{.Image}}' "$(docker ps -aq)")
-
-echo "IMAGES: $IMAGES"
+echo "OUR IMAGES LIST: $IMAGES"
 
 for IMAGE in $IMAGES; do
+    echo ""
+    echo ""
     echo "IMAGE: $IMAGE"
     
     NAME=$(basename "${GITHUB_REPOSITORY}").$(docker inspect --format '{{ index .Config.Labels "name" }}' "$IMAGE")
