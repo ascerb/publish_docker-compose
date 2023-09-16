@@ -10,6 +10,8 @@ docker login ghcr.io -u "${GITHUB_REF}" -p "${REPO_TOKEN}"
 
 VERSION=$VERSION docker compose -f "$OVERRIDE" build
 
+echo "REPO: $GITHUB_REPOSITORY"
+
 DIM=$(docker images -aq)
 echo "DIM1 $DIM"
 
