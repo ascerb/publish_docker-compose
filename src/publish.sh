@@ -8,53 +8,17 @@ echo "OVERRIDE=$OVERRIDE"
 
 docker login ghcr.io -u "${GITHUB_REF}" -p "${REPO_TOKEN}"
 
-VERSION=$VERSION docker compose -f docker-compose.yml -f "$OVERRIDE" build
+VERSION=$VERSION docker compose -f "$OVERRIDE" build
+IMAGES=$(docker inspect --format='{{.Image}}' "$(docker ps -aq)")
 
-echo "Docker ps1:"
-echo "---"
-echo "$(docker ps -aq)" | base64
-echo "---"
+echo "IMAGES: $IMAGES"
 
-IMAGES_IN_DIR=$(docker ps -aq)
-
-
-echo "Images in dir:"
-echo "---"
-echo "$IMAGES_IN_DIR" | base64
-echo "$IMAGES_IN_DIR"
-echo "---"
-
-echo "!!!"
-$(docker ps -aq) > 1.txt
-cat 1.txt | base64
-echo "!!!"
-
-
-
-#IMAGES=$(docker inspect --format='{{.Config.Image}}' $IMAGES_IN_DIR)
-#IMAGES=$(docker inspect  --size --format='{{.Id}}' "$IMAGES_IN_DIR")
-
-#echo "IMAGES: $IMAGES"
-
-#exit 1
-
-for IMAGE_RAW in $IMAGES_IN_DIR; do
-    echo "IMAGE RAW: $IMAGE_RAW"
-
-    IMAGE=$(docker inspect  --size --format='{{.Id}}' "$IMAGE_RAW")
-
-    if [ -z "$IMAGE" ]
-      then
-          echo "\$IMAGE is empty"
-      else
-          echo "\$var is NOT empty"
+for IMAGE in $IMAGES; do
+    echo "IMAGE: $IMAGE"
     
-          NAME=$(basename "${GITHUB_REPOSITORY}").$(docker inspect --format '{{ index .Config.Labels "name" }}' "$IMAGE")
-          TAG="ghcr.io/${GITHUB_REPOSITORY}/$NAME:$VERSION"
+    NAME=$(basename "${GITHUB_REPOSITORY}").$(docker inspect --format '{{ index .Config.Labels "name" }}' "$IMAGE")
+    TAG="ghcr.io/${GITHUB_REPOSITORY}/$NAME:$VERSION"
 
-          docker tag "$IMAGE" "$TAG"
-          docker push "$TAG"
-      fi
-
-
+    docker tag "$IMAGE" "$TAG"
+    docker push "$TAG"
 done
