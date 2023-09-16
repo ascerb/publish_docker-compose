@@ -12,19 +12,21 @@ VERSION=$VERSION docker compose -f docker-compose.yml -f "$OVERRIDE" build
 
 echo "Docker ps1:"
 echo "---"
-echo "$(docker ps -aq)"
+echo "$(docker ps -aq)" | base64
 echo "---"
 
 IMAGES_IN_DIR=$(docker ps -aq)
 
+
 echo "Images in dir:"
 echo "---"
+echo "$IMAGES_IN_DIR" | base64
 echo "$IMAGES_IN_DIR"
 echo "---"
 
 echo "!!!"
-docker ps -aq > 1.txt
-cat 1.txt
+$(docker ps -aq) > 1.txt
+cat 1.txt | base64
 echo "!!!"
 
 
