@@ -9,6 +9,13 @@ echo "OVERRIDE=$OVERRIDE"
 docker login ghcr.io -u "${GITHUB_REF}" -p "${REPO_TOKEN}"
 
 VERSION=$VERSION docker compose -f "$OVERRIDE" build
+
+DIM=$(docker images -aq)
+echo "DIM $DIM"
+
+
+
+
 IMAGES=$(docker inspect --format='{{.Image}}' "$(docker ps -aq)")
 
 echo "IMAGES: $IMAGES"
