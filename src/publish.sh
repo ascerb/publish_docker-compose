@@ -10,7 +10,7 @@ docker login ghcr.io -u "${GITHUB_REF}" -p "${REPO_TOKEN}"
 
 VERSION=$VERSION docker compose -f docker-compose.yml -f "$OVERRIDE" build
 
-echo "Docker ps:"
+echo "Docker ps1:"
 echo "---"
 echo "$(docker ps -aq)"
 echo "---"
@@ -21,6 +21,12 @@ echo "Images in dir:"
 echo "---"
 echo "$IMAGES_IN_DIR"
 echo "---"
+
+echo "!!!"
+docker ps -aq > 1.txt
+cat 1.txt
+echo "!!!"
+
 
 
 #IMAGES=$(docker inspect --format='{{.Config.Image}}' $IMAGES_IN_DIR)
